@@ -1,0 +1,13 @@
+$feature-flags: (
+  grid-columns-16: true,
+);
+
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+@import "../node_modules/carbon-components/scss/globals/scss/styles.scss";
+
+@media (min-width: 42rem) {
+  .bx--grid--no-gutter {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
