@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
-import { Link } from "react-router-dom";
+import ModalWrapper from "../ModalWrapper/ModalWrapper";
 import {
   DataTable,
   TableContainer,
@@ -22,10 +22,15 @@ import {
   TableSelectAll,
   Tag,
   Modal,
-  Search,
+  TextInput,
   TableSelectRow,
+  CopyButton,
 } from "carbon-components-react";
-import { OverflowMenuVertical20, FolderAdd20 } from "@carbon/icons-react";
+import {
+  OverflowMenuVertical20,
+  FolderAdd20,
+  Copy20,
+} from "@carbon/icons-react";
 
 import {
   setCurrentDestination,
@@ -72,6 +77,7 @@ const FileDetails = () => {
   const dispatch = useDispatch();
   const path = useLocation().pathname;
 
+  const shareableLink = useSelector((state) => state.fileDownload.link);
   const files = useSelector((state) => state.destination.files);
 
   useEffect(() => {
@@ -81,6 +87,67 @@ const FileDetails = () => {
 
   const handleFileDownload = (downloadFileId) => {
     dispatch(fetchFileDownload(downloadFileId));
+  };
+
+  const [{ id, fileName }, setFile] = useState({});
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+  const [openRenameModal, setOpenRenameModal] = useState(false);
+  const [newFileName, setNewFileName] = useState("");
+
+  const [openShareModal, setOpenShareModal] = useState(false);
+  const [shareLink, setShareLink] = useState("");
+
+  const onDelete = (id, fileName) => {
+    setOpenDeleteModal(true);
+    console.log("onDelete - " + id + " " + fileName);
+    setFile({ id: id, fileName: fileName });
+  };
+
+  const onDeleteConfirm = (ok) => {
+    if (ok) {
+      console.log("onDeleteConfirm - " + id + " " + fileName);
+      dispatch(fetchDestinationFiles(path));
+    } else {
+      console.log("Not ok");
+    }
+    setFile({});
+  };
+
+  const onRename = (id, fileName) => {
+    setOpenRenameModal(true);
+    console.log("onRename - " + id + " " + fileName);
+    setNewFileName(fileName);
+    setFile({ id: id, fileName: fileName });
+  };
+
+  const onRenameConfirm = (ok) => {
+    if (ok) {
+      console.log(
+        "onRenameConfirm - " + id + " " + fileName + " --> " + newFileName
+      );
+      dispatch(fetchDestinationFiles(path));
+    } else {
+      console.log("Not ok");
+    }
+    setFile({});
+  };
+
+  const onShare = (id, fileName) => {
+    setOpenShareModal(true);
+    dispatch(fetchFileDownload(id));
+    console.log("onDelete - " + id + " " + fileName);
+    setFile({ id: id, fileName: fileName });
+  };
+
+  const onShareConfirm = (ok) => {
+    if (ok) {
+      console.log("onShareConfirm - " + id + " " + fileName);
+    } else {
+      console.log("Not ok");
+    }
+    setFile({});
   };
 
   return (
@@ -147,24 +214,31 @@ const FileDetails = () => {
                     <TableRow key={row.id} {...getRowProps({ row })}>
                       <TableSelectRow {...getSelectionProps({ row })} />
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                        <TableCell key={cell.id}>
+                          <span className="bx--text-truncate--end">
+                            {cell.value}
+                          </span>
+                        </TableCell>
                       ))}
                       <TableCell className="bx--table-column-menu">
                         <OverflowMenu className="ml-auto" light flipped>
-                          <OverflowMenuItem itemText="Move"></OverflowMenuItem>
+                          <OverflowMenuItem
+                            onClick={() => onRename(row.id, row.cells[0].value)}
+                            itemText="Rename"
+                          ></OverflowMenuItem>
                           <OverflowMenuItem
                             onClick={() => handleFileDownload(row.id)}
                             itemText="Download"
                           ></OverflowMenuItem>
                           <OverflowMenuItem
                             itemText="Share"
-                            // onClick={() => setOpen(true)}
+                            onClick={() => onShare(row.id, row.cells[0].value)}
                           ></OverflowMenuItem>
                           <OverflowMenuItem
                             hasDivider
                             isDelete
                             itemText="Delete"
-                            // onClick={() => batchActionClick(row)}
+                            onClick={() => onDelete(row.id, row.cells[0].value)}
                           ></OverflowMenuItem>
                         </OverflowMenu>
                       </TableCell>
@@ -175,6 +249,98 @@ const FileDetails = () => {
             </TableContainer>
           )}
         </DataTable>
+
+        <ModalWrapper>
+          {openDeleteModal ? (
+            <Modal
+              modalHeading={
+                'Are you sure you want to delete "' +
+                fileName +
+                '" from Cloudshare?'
+              }
+              primaryButtonText="Delete"
+              secondaryButtonText="Cancel"
+              danger
+              shouldSubmitOnEnter
+              open={openDeleteModal}
+              onRequestSubmit={() => {
+                onDeleteConfirm(true);
+                setOpenDeleteModal(false);
+              }}
+              onRequestClose={() => {
+                onDeleteConfirm(false);
+                setOpenDeleteModal(false);
+              }}
+            ></Modal>
+          ) : null}
+          {openRenameModal ? (
+            <Modal
+              modalHeading="Rename File"
+              primaryButtonText="Submit"
+              secondaryButtonText="Cancel"
+              shouldSubmitOnEnter
+              open={openRenameModal}
+              onRequestSubmit={() => {
+                onRenameConfirm(true);
+                setOpenRenameModal(false);
+              }}
+              primaryButtonDisabled={newFileName === ""}
+              onRequestClose={() => {
+                onRenameConfirm(false);
+                setOpenRenameModal(false);
+              }}
+            >
+              <TextInput
+                invalid={newFileName === ""}
+                invalidText="A valid name is required"
+                data-modal-primary-focus
+                value={newFileName}
+                id="rename-file-selected-row"
+                labelText="Name"
+                placeholder="New file name"
+                onChange={(e) => setNewFileName(e.target.value)}
+              />
+            </Modal>
+          ) : null}
+
+          {openShareModal ? (
+            <Modal
+              modalHeading="Share"
+              secondaryButtonText="Close"
+              shouldSubmitOnEnter
+              open={openShareModal}
+              onRequestSubmit={() => {
+                onRenameConfirm(true);
+                setOpenShareModal(false);
+              }}
+              primaryButtonDisabled={shareableLink === ""}
+              onRequestClose={() => {
+                onRenameConfirm(false);
+                setOpenShareModal(false);
+              }}
+            >
+              <div className="d-flex pb-5">
+                <TextInput
+                  className="w-80"
+                  invalid={shareableLink === ""}
+                  invalidText="A valid name is required"
+                  data-modal-primary-focus
+                  value={shareableLink}
+                  id="share-file-selected-row"
+                  placeholder="Link"
+                  // onChange={(e) => setNewFileName(e.target.value)}
+                />
+                <CopyButton
+                  onClick={() => {
+                    navigator.clipboard.writeText(shareableLink);
+                  }}
+                >
+                  <Copy20 />
+                </CopyButton>
+              </div>
+            </Modal>
+          ) : null}
+        </ModalWrapper>
       </div>
     </div>
   );
