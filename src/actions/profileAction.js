@@ -1,4 +1,6 @@
 import { profileConstants } from "../constants";
+import { logout } from "../actions/authAction";
+
 import api from "../utils/api";
 
 const fetchProfileRequest = () => {
@@ -10,7 +12,7 @@ const fetchProfileRequest = () => {
 const fetchProfileSuccess = (profile) => {
   return {
     type: profileConstants.FETCH_PROFILE_SUCCESS,
-    payload: profile
+    payload: profile,
   };
 };
 
@@ -37,5 +39,6 @@ export const fetchProfile = () => (dispatch) => {
         errorMessage = "Connection Issue";
       }
       dispatch(fetchProfileFailure(errorMessage));
+      dispatch(logout());
     });
 };

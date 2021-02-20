@@ -1,5 +1,6 @@
-import React from "react";
-import { render } from "react-dom";
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
+
 import "carbon-components/css/carbon-components.min.css";
 import {
   DataTable,
@@ -11,162 +12,142 @@ import {
   TableBody,
   TableCell,
   TableToolbar,
-  TableBatchAction,
+  OverflowMenu,
+  OverflowMenuItem,
   TableToolbarContent,
   TableToolbarSearch,
   TableToolbarMenu,
   TableToolbarAction,
   Button,
-  TableBatchActions,
   TableSelectAll,
+  Tag,
+  Modal,
+  Search,
   TableSelectRow,
 } from "carbon-components-react";
+import {
+  OverflowMenuVertical20,
+  FolderAdd20,
+  Delete20,
+} from "@carbon/icons-react";
+import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setCurrentDestination,
+  fetchDestinationFiles,
+} from "../../actions/destinationAction";
+
+import { fetchFileDownload } from "../../actions/fileDownloadAction";
+
 export const rows = [
   {
     id: "a",
     name: "Load Balancer 3",
     protocol: "HTTP",
-    port: 3000,
   },
   {
     id: "b",
     name: "Load Balancer 1",
-    protocol: "HTTP",
-    port: 443,
   },
   {
     id: "c",
     name: "Load Balancer 2",
-    protocol: "HTTP",
-    port: 80,
   },
   {
     id: "d",
     name: "Load Balancer 6",
-    protocol: "HTTP",
-    port: 3000,
   },
   {
     id: "e",
     name: "Load Balancer 4",
-    protocol: "HTTP",
-    port: 443,
   },
   {
     id: "f",
     name: "Load Balancer 5",
-    protocol: "HTTP",
-    port: 80,
   },
 ];
 
 export const headers = [
   {
     key: "name",
-    header: "Name",
-  },
-  {
-    key: "protocol",
-    header: "Protocol",
-  },
-  {
-    key: "port",
-    header: "Port",
+    header: "File Name",
   },
 ];
 
-export const batchActionClick = (selectedRows) => () => selectedRows;
+const RepoTable = () => {
+  const path = "useLocation()";
+  let lastPath = "";
+  let lastRouteName = "";
 
-const RepoTable = () => (
-  <DataTable rows={rows} headers={headers}>
-    {({
-      rows,
-      headers,
-      getHeaderProps,
-      getRowProps,
-      getSelectionProps,
-      getToolbarProps,
-      getBatchActionProps,
-      onInputChange,
-      selectedRows,
-      getTableProps,
-      getTableContainerProps,
-    }) => (
-      <TableContainer>
-        <TableToolbar {...getToolbarProps()}>
-          <TableBatchActions {...getBatchActionProps()}>
-            <TableBatchAction
-              tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
-              onClick={batchActionClick(selectedRows)}
-            >
-              Delete
-            </TableBatchAction>
-            <TableBatchAction
-              tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
-              onClick={batchActionClick(selectedRows)}
-            >
-              Save
-            </TableBatchAction>
-            <TableBatchAction
-              tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
-              onClick={batchActionClick(selectedRows)}
-            >
-              Download
-            </TableBatchAction>
-          </TableBatchActions>
-          <TableToolbarContent>
-            <TableToolbarSearch
-              defaultExpanded
-              tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-              onChange={onInputChange}
-            />
-            <TableToolbarMenu
-              tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-            >
-              <TableToolbarAction onClick={() => alert("Alert 1")}>
-                Action 1
-              </TableToolbarAction>
-              <TableToolbarAction onClick={() => alert("Alert 2")}>
-                Action 2
-              </TableToolbarAction>
-              <TableToolbarAction onClick={() => alert("Alert 3")}>
-                Action 3
-              </TableToolbarAction>
-            </TableToolbarMenu>
-            <Button
-              tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-              size="small"
-              kind="primary"
-            >
-              Add new
-            </Button>
-          </TableToolbarContent>
-        </TableToolbar>
-        <Table {...getTableProps()}>
-          <TableHead>
-            <TableRow>
-              <TableSelectAll {...getSelectionProps()} />
-              {headers.map((header, i) => (
-                <TableHeader key={i} {...getHeaderProps({ header })}>
-                  {header.header}
-                </TableHeader>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row, i) => (
-              <TableRow key={i} {...getRowProps({ row })}>
-                <TableSelectRow {...getSelectionProps({ row })} />
-                {row.cells.map((cell) => (
-                  <TableCell key={cell.id}>{cell.value}</TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    )}
-  </DataTable>
-);
+  // console.log(path);
+
+  const files = useSelector((state) => state.destination.files);
+  const link = useSelector((state) => state.fileDownload.link);
+
+  const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   dispatch(setCurrentDestination(path));
+  //   dispatch(fetchDestinationFiles(path));
+  // }, [path]);
+
+  useEffect(() => {
+    console.log(link);
+    const url = link;
+    var ifrm = document.createElement("object");
+    ifrm.setAttribute("data", url);
+    document.body.appendChild(ifrm);
+  }, [link]);
+
+  const [open, setOpen] = useState(false);
+
+  const withStateManagerProps = () => ({
+    className: "some-class",
+    passiveModal: false,
+    danger: false,
+    alert: false,
+    shouldSubmitOnEnter: false,
+    hasScrollingContent: false,
+    modalHeading: "Modal Heading",
+    modalLabel: "Label",
+    modalAriaLabel:
+      "A label to be read by screen readers on the modal root node",
+    primaryButtonText: "Primary Button",
+    secondaryButtonText: "Secondary Button",
+    selectorPrimaryFocus: "[data-modal-primary-focus]",
+    size: "sm",
+    iconDescription: "Close",
+    onBlur: console.log("onBlur"),
+    onClick: console.log("onClick"),
+    onFocus: console.log("onFocus"),
+    onRequestClose: console.log("onRequestClose"),
+    onRequestSubmit: () => console.log("onRequestSubmit"),
+    onSecondarySubmit: console.log("onSecondarySubmit"),
+  });
+  const { size, ...rest } = withStateManagerProps();
+
+  const handleInput = (e) => {
+    console.log(e);
+  };
+
+  return (
+    <React.Fragment>
+      <Button onClick={() => setOpen(true)}>Hello</Button>
+
+      <Modal
+        {...rest}
+        size={size || undefined}
+        open={open}
+        onRequestClose={() => setOpen(false)}
+      >
+        {true && (
+          <>
+            <Search onChange={handleInput} id="search-1" />
+          </>
+        )}
+      </Modal>
+    </React.Fragment>
+  );
+};
 
 export default RepoTable;

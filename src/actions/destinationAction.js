@@ -12,10 +12,10 @@ const fetchDestinationFilesRequest = () => {
   };
 };
 
-const fetchDestinationFilesSuccess = (profile) => {
+const fetchDestinationFilesSuccess = (files) => {
   return {
     type: destinationConstants.FETCH_DESTINATION_FILES_SUCCESS,
-    payload: profile,
+    payload: files,
   };
 };
 
@@ -29,13 +29,12 @@ const fetchDestinationFilesFailure = (error) => {
 export const fetchDestinationFiles = (path) => (dispatch) => {
   dispatch(fetchDestinationFilesRequest());
   api
-    .post("file/all", { path: path.pathname })
+    .post("file/all", { path: path })
     .then((response) => {
       dispatch(fetchDestinationFilesSuccess(response.data));
     })
     .catch((error) => {
       let errorMessage;
-      console.log(error.response);
       if (error.response) {
         errorMessage = error.response.data;
       } else {

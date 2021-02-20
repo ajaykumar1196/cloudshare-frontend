@@ -11,3 +11,9 @@ $feature-flags: (
     padding-right: 1rem;
   }
 }
+
+@media (max-width: 42rem) {
+  .bx--content {
+    padding: 1rem !important;
+  }
+}

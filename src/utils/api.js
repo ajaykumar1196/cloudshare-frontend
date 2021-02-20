@@ -11,10 +11,11 @@ api.interceptors.response.use(
     return response;
   },
   function (error) {
-    const { status } = error.response;
-    if (status === 401) {
-      localStorage.removeItem("authToken");
-      console.log("removed token in interceptor");
+    if (!axios.isCancel(error)) {
+      const { status } = error.response;
+      if (status === 401) {
+        localStorage.removeItem("authToken");
+      }
     }
     return Promise.reject(error);
   }

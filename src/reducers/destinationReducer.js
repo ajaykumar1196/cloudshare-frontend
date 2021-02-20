@@ -1,7 +1,7 @@
 import { destinationConstants } from "../constants";
 
 const initalState = {
-  files: null,
+  files: [],
   currentDestination: "",
   isLoading: false,
   errorMessage: "",

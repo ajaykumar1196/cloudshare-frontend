@@ -1,5 +1,6 @@
 export const fileUploadConstants = {
   SET_UPLOAD_FILE: "SET_UPLOAD_FILE",
+  SET_CANCEL_TOKEN: "SET_CANCEL_TOKEN",
 
   UPLOADING: "UPLOADING",
   CANCELED: "CANCELED",

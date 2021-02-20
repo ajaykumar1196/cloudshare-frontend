@@ -57,6 +57,18 @@ const fileUploadReducer = (state = initalState, action) => {
         totalPending: state.totalPending - 1,
       };
 
+    case fileUploadConstants.SET_CANCEL_TOKEN:
+      return {
+        ...state,
+        fileProgress: {
+          ...state.fileProgress,
+          [action.payload.id]: {
+            ...state.fileProgress[action.payload.id],
+            source: action.payload.source,
+          },
+        },
+      };
+
     case fileUploadConstants.FAILURE_UPLOAD_FILE:
       return {
         ...state,

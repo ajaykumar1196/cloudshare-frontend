@@ -1,32 +1,44 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import "./app.scss";
 import { Content } from "carbon-components-react";
-import TutorialHeader from "./components/TutorialHeader";
+import NavHeader from "./components/NavHeader/NavHeader";
+import FileUpload from "./components/FileUpload/FileUpload";
 import LandingPage from "./content/LandingPage/LandingPage";
 import ProfilePage from "./content/ProfilePage/ProfilePage";
+import LoginPage from "./content/LoginPage/LoginPage";
+import SignupPage from "./content/SignupPage/SignupPage";
 import { Route, Redirect, BrowserRouter, Switch } from "react-router-dom";
 import { PrivateRoute } from "./components/PrivateRoute/PrivateRoute";
 
-class App extends Component {
-  render() {
-    return (
-      <div>
-        <BrowserRouter>
-          <TutorialHeader />
-          <Content>
-            <Switch>
-              <Route exact path="/home" component={LandingPage} />
-              <Route path="/home/:folder" component={LandingPage} />
-              <PrivateRoute path="/profile" component={ProfilePage} />
-              {/* <Route path="/login" component={Login} />
-              <Route path="/signup" component={Signup} /> */}
-              <Redirect from="*" to="/home" />
-            </Switch>
-          </Content>
-        </BrowserRouter>
-      </div>
-    );
-  }
-}
+const App = () => {
+  const link = useSelector((state) => state.fileDownload.link);
+
+  useEffect(() => {
+    const url = link;
+    var ifrm = document.createElement("object");
+    ifrm.setAttribute("data", url);
+    document.body.appendChild(ifrm);
+  }, [link]);
+
+  return (
+    <div>
+      <BrowserRouter>
+        <NavHeader />
+        <Content>
+          <Switch>
+            <PrivateRoute exact path="/dashboard" component={LandingPage} />
+            <PrivateRoute path="/dashboard/:folder" component={LandingPage} />
+            <PrivateRoute path="/profile" component={ProfilePage} />
+            <Route path="/login" component={LoginPage} />
+            <Route path="/signup" component={SignupPage} />
+            <Redirect from="*" to="/dashboard" />
+          </Switch>
+        </Content>
+        <FileUpload />
+      </BrowserRouter>
+    </div>
+  );
+};
 
 export default App;
