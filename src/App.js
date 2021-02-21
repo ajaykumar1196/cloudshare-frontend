@@ -18,7 +18,7 @@ const App = () => {
     const url = link;
     var ifrm = document.createElement("object");
     ifrm.setAttribute("data", url);
-    ifrm.style.display = "none";
+    ifrm.style.height = "0px";
     document.body.appendChild(ifrm);
   }, [link]);
 

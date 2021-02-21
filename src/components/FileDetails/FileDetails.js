@@ -305,15 +305,11 @@ const FileDetails = () => {
 
           {openShareModal ? (
             <Modal
-              modalHeading="Share"
+              modalHeading="Share Link"
               secondaryButtonText="Close"
               shouldSubmitOnEnter
               open={openShareModal}
-              onRequestSubmit={() => {
-                onRenameConfirm(true);
-                setOpenShareModal(false);
-              }}
-              primaryButtonDisabled={shareableLink === ""}
+              passiveModal
               onRequestClose={() => {
                 onRenameConfirm(false);
                 setOpenShareModal(false);
@@ -321,7 +317,6 @@ const FileDetails = () => {
             >
               <div className="d-flex pb-5">
                 <TextInput
-                  className="w-80"
                   invalid={shareableLink === ""}
                   invalidText="A valid name is required"
                   data-modal-primary-focus
@@ -334,9 +329,7 @@ const FileDetails = () => {
                   onClick={() => {
                     navigator.clipboard.writeText(shareableLink);
                   }}
-                >
-                  <Copy20 />
-                </CopyButton>
+                ></CopyButton>
               </div>
             </Modal>
           ) : null}
