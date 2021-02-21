@@ -30,6 +30,7 @@ import {
   OverflowMenuVertical20,
   FolderAdd20,
   Copy20,
+  Folder20,
 } from "@carbon/icons-react";
 
 import {
@@ -37,6 +38,8 @@ import {
   fetchDestinationFiles,
 } from "../../actions/destinationAction";
 import { fetchFileDownload } from "../../actions/fileDownloadAction";
+import { fetchCreateFolder } from "../../actions/folderAction";
+import { Link } from "react-router-dom";
 
 export const rows = [
   {
@@ -71,6 +74,10 @@ export const headers = [
     key: "name",
     header: "File Name",
   },
+  {
+    key: "type",
+    header: "",
+  },
 ];
 
 const FileDetails = () => {
@@ -97,7 +104,11 @@ const FileDetails = () => {
   const [newFileName, setNewFileName] = useState("");
 
   const [openShareModal, setOpenShareModal] = useState(false);
-  const [shareLink, setShareLink] = useState("");
+
+  const [openMoveModal, setOpenMoveModal] = useState(false);
+
+  const [openCreateFolderModal, setOpenCreateFolderModal] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
 
   const onDelete = (id, fileName) => {
     setOpenDeleteModal(true);
@@ -137,17 +148,41 @@ const FileDetails = () => {
   const onShare = (id, fileName) => {
     setOpenShareModal(true);
     dispatch(fetchFileDownload(id));
-    console.log("onDelete - " + id + " " + fileName);
+    console.log("onShare - " + id + " " + fileName);
     setFile({ id: id, fileName: fileName });
   };
 
-  const onShareConfirm = (ok) => {
+  const onMove = (id, fileName) => {
+    setOpenMoveModal(true);
+    console.log("onMove - " + id + " " + fileName);
+    setFile({ id: id, fileName: fileName });
+  };
+
+  const onMoveConfirm = (ok) => {
     if (ok) {
-      console.log("onShareConfirm - " + id + " " + fileName);
+      console.log("onMoveConfirm - " + id + " " + fileName);
     } else {
       console.log("Not ok");
     }
     setFile({});
+  };
+
+  const onCreateFolder = () => {
+    setOpenCreateFolderModal(true);
+    console.log("onCreateFolder - " + newFolderName);
+    setNewFolderName(newFolderName);
+    setFile({ id: id, fileName: fileName });
+  };
+
+  const onCreateFolderConfirm = (ok) => {
+    if (ok) {
+      console.log("onCreateFolderConfirm - " + newFolderName.trim());
+      let folder = { folderName: newFolderName, destinationId: path };
+      dispatch(fetchCreateFolder(folder));
+    } else {
+      console.log("Not ok");
+    }
+    setNewFolderName("");
   };
 
   return (
@@ -179,12 +214,18 @@ const FileDetails = () => {
                     >
                       Move
                     </TableToolbarAction>
-                    <TableToolbarAction onClick={() => alert("Alert 2")}>
-                      Delete
+                    <TableToolbarAction
+                      onClick={() => console.log(selectedRows)}
+                    >
+                      Selected
                     </TableToolbarAction>
                   </TableToolbarMenu>
 
-                  <Button hasIconOnly renderIcon={FolderAdd20}></Button>
+                  <Button
+                    onClick={onCreateFolder}
+                    hasIconOnly
+                    renderIcon={FolderAdd20}
+                  ></Button>
                 </TableToolbarContent>
               </TableToolbar>
               <Table overflowMenuOnHover={false}>
@@ -199,7 +240,7 @@ const FileDetails = () => {
                       >
                         {header.header}
 
-                        {selectedRows.length !== 0 ? (
+                        {selectedRows.length !== 0 && header.key === "name" ? (
                           <Tag type="blue">
                             {selectedRows.length} files selected
                           </Tag>
@@ -213,13 +254,18 @@ const FileDetails = () => {
                   {rows.map((row) => (
                     <TableRow key={row.id} {...getRowProps({ row })}>
                       <TableSelectRow {...getSelectionProps({ row })} />
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>
-                          <span className="bx--text-truncate--end">
-                            {cell.value}
-                          </span>
-                        </TableCell>
-                      ))}
+
+                      <TableCell key={row.cells[0].id}>
+                        {row.cells[1].value === "folder" ? (
+                          <Link to={path + "/" + row.cells[0].value}>
+                            <Folder20 className="mr-1" />
+                            {row.cells[0].value}
+                          </Link>
+                        ) : (
+                          row.cells[0].value
+                        )}
+                      </TableCell>
+
                       <TableCell className="bx--table-column-menu">
                         <OverflowMenu className="ml-auto" light flipped>
                           <OverflowMenuItem
@@ -233,6 +279,10 @@ const FileDetails = () => {
                           <OverflowMenuItem
                             itemText="Share"
                             onClick={() => onShare(row.id, row.cells[0].value)}
+                          ></OverflowMenuItem>
+                          <OverflowMenuItem
+                            onClick={() => onMove(row.id, row.cells[0].value)}
+                            itemText="Move"
                           ></OverflowMenuItem>
                           <OverflowMenuItem
                             hasDivider
@@ -331,6 +381,54 @@ const FileDetails = () => {
                   }}
                 ></CopyButton>
               </div>
+            </Modal>
+          ) : null}
+
+          {openMoveModal ? (
+            <Modal
+              modalHeading={'Move file "' + fileName + '" to'}
+              primaryButtonText="Move"
+              secondaryButtonText="Cancel"
+              shouldSubmitOnEnter
+              open={openMoveModal}
+              onRequestSubmit={() => {
+                onMoveConfirm(true);
+                setOpenMoveModal(false);
+              }}
+              onRequestClose={() => {
+                onMoveConfirm(false);
+                setOpenMoveModal(false);
+              }}
+            >
+              <div></div>
+            </Modal>
+          ) : null}
+
+          {openCreateFolderModal ? (
+            <Modal
+              modalHeading="Create Folder"
+              primaryButtonText="Create"
+              secondaryButtonText="Cancel"
+              shouldSubmitOnEnter
+              open={openCreateFolderModal}
+              onRequestSubmit={() => {
+                onCreateFolderConfirm(true);
+                setOpenCreateFolderModal(false);
+              }}
+              primaryButtonDisabled={newFolderName.trim() === ""}
+              onRequestClose={() => {
+                onCreateFolderConfirm(false);
+                setOpenCreateFolderModal(false);
+              }}
+            >
+              <TextInput
+                data-modal-primary-focus
+                value={newFolderName}
+                id="create-folder"
+                labelText="Name"
+                placeholder="New folder name"
+                onChange={(e) => setNewFolderName(e.target.value)}
+              />
             </Modal>
           ) : null}
         </ModalWrapper>
