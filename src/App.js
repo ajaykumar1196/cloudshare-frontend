@@ -28,12 +28,12 @@ const App = () => {
         <NavHeader />
         <Content>
           <Switch>
-            <PrivateRoute exact path="/dashboard" component={LandingPage} />
-            <PrivateRoute path="/dashboard/:folder" component={LandingPage} />
+            <PrivateRoute exact path="/" component={LandingPage} />
+            <PrivateRoute exact path="/:parentId" component={LandingPage} />
             <PrivateRoute path="/profile" component={ProfilePage} />
             <Route path="/login" component={LoginPage} />
             <Route path="/signup" component={SignupPage} />
-            <Redirect from="*" to="/dashboard" />
+            <Redirect from="*" to="/" />
           </Switch>
         </Content>
         <FileUpload />

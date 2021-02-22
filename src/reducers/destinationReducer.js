@@ -2,7 +2,7 @@ import { destinationConstants } from "../constants";
 
 const initalState = {
   files: [],
-  currentDestination: "",
+  parentId: null,
   isLoading: false,
   errorMessage: "",
 };
@@ -12,7 +12,7 @@ const destinationReducer = (state = initalState, action) => {
     case destinationConstants.SET_CURRENT_DESTINATION:
       return {
         ...state,
-        currentDestination: action.payload,
+        parentId: action.payload,
       };
     case destinationConstants.FETCH_DESTINATION_FILES_REQUEST:
       return {

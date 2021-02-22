@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router";
+import { useLocation, useParams } from "react-router";
 import ModalWrapper from "../ModalWrapper/ModalWrapper";
 import {
   DataTable,
@@ -82,15 +82,15 @@ export const headers = [
 
 const FileDetails = () => {
   const dispatch = useDispatch();
-  const path = useLocation().pathname;
+  const { parentId } = useParams();
 
   const shareableLink = useSelector((state) => state.fileDownload.link);
   const files = useSelector((state) => state.destination.files);
 
   useEffect(() => {
-    dispatch(setCurrentDestination(path));
-    dispatch(fetchDestinationFiles(path));
-  }, [path]);
+    dispatch(setCurrentDestination(parentId));
+    dispatch(fetchDestinationFiles(parentId));
+  }, [parentId]);
 
   const handleFileDownload = (downloadFileId) => {
     dispatch(fetchFileDownload(downloadFileId));
@@ -119,7 +119,7 @@ const FileDetails = () => {
   const onDeleteConfirm = (ok) => {
     if (ok) {
       console.log("onDeleteConfirm - " + id + " " + fileName);
-      dispatch(fetchDestinationFiles(path));
+      dispatch(fetchDestinationFiles(parentId));
     } else {
       console.log("Not ok");
     }
@@ -138,7 +138,7 @@ const FileDetails = () => {
       console.log(
         "onRenameConfirm - " + id + " " + fileName + " --> " + newFileName
       );
-      dispatch(fetchDestinationFiles(path));
+      dispatch(fetchDestinationFiles(parentId));
     } else {
       console.log("Not ok");
     }
@@ -177,7 +177,7 @@ const FileDetails = () => {
   const onCreateFolderConfirm = (ok) => {
     if (ok) {
       console.log("onCreateFolderConfirm - " + newFolderName.trim());
-      let folder = { folderName: newFolderName, destinationId: path };
+      let folder = { folderName: newFolderName, parentId: parentId };
       dispatch(fetchCreateFolder(folder));
     } else {
       console.log("Not ok");
@@ -257,7 +257,7 @@ const FileDetails = () => {
 
                       <TableCell key={row.cells[0].id}>
                         {row.cells[1].value === "folder" ? (
-                          <Link to={path + "/" + row.cells[0].value}>
+                          <Link to={"/" + row.id}>
                             <Folder20 className="mr-1" />
                             {row.cells[0].value}
                           </Link>

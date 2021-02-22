@@ -40,7 +40,7 @@ function NavHeader() {
 
   return (
     <Header aria-label="Cloudshare">
-      <HeaderName element={Link} to="/dashboard" prefix="">
+      <HeaderName element={Link} to="/" prefix="">
         Cloudshare
       </HeaderName>
       {isAuthenticated ? (
@@ -62,11 +62,7 @@ function NavHeader() {
             style={{ bottom: "unset" }}
           >
             <Switcher aria-label="Switcher Container">
-              <SwitcherItem
-                aria-label="Dashboard Link"
-                element={Link}
-                to="/dashboard"
-              >
+              <SwitcherItem aria-label="Dashboard Link" element={Link} to="/">
                 Dashboard
               </SwitcherItem>
               <SwitcherItem

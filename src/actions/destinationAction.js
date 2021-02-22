@@ -1,9 +1,9 @@
 import api from "../utils/api";
 import { destinationConstants } from "../constants";
 
-export const setCurrentDestination = (path) => ({
+export const setCurrentDestination = (parentId) => ({
   type: destinationConstants.SET_CURRENT_DESTINATION,
-  payload: path,
+  payload: parentId,
 });
 
 const fetchDestinationFilesRequest = () => {
@@ -26,10 +26,10 @@ const fetchDestinationFilesFailure = (error) => {
   };
 };
 
-export const fetchDestinationFiles = (path) => (dispatch) => {
+export const fetchDestinationFiles = (parentId) => (dispatch) => {
   dispatch(fetchDestinationFilesRequest());
   api
-    .post("file/all", { path: path })
+    .post("file/all", { parentId: parentId })
     .then((response) => {
       dispatch(fetchDestinationFilesSuccess(response.data));
     })
