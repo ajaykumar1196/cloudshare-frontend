@@ -15,6 +15,23 @@ export const modifyFiles = (existingFiles, files) => {
   return fileToUpload;
 };
 
+export const addFoldersBreadcrumbs = (folders) => {
+  let newfolders = {};
+  for (let i = 0; i < folders.length; i++) {
+    const folder = folders[i];
+    newfolders = {
+      ...newfolders,
+      [folder.id]: {
+        id: folder.id,
+        parentId: folder.parentId,
+        name: folder.name,
+      },
+    };
+  }
+
+  return newfolders;
+};
+
 export const extractFileName = (contentDispositionValue) => {
   var filename = "";
   if (

@@ -40,6 +40,7 @@ import {
 import { fetchFileDownload } from "../../actions/fileDownloadAction";
 import { fetchCreateFolder } from "../../actions/folderAction";
 import { Link } from "react-router-dom";
+import MoveModal from "../MoveModal/MoveModal";
 
 export const rows = [
   {
@@ -158,9 +159,9 @@ const FileDetails = () => {
     setFile({ id: id, fileName: fileName });
   };
 
-  const onMoveConfirm = (ok) => {
+  const onMoveConfirm = (ok, newParentId) => {
     if (ok) {
-      console.log("onMoveConfirm - " + id + " " + fileName);
+      console.log("onMoveConfirm - " + parentId + "-->" + newParentId);
     } else {
       console.log("Not ok");
     }
@@ -385,23 +386,13 @@ const FileDetails = () => {
           ) : null}
 
           {openMoveModal ? (
-            <Modal
-              modalHeading={'Move file "' + fileName + '" to'}
-              primaryButtonText="Move"
-              secondaryButtonText="Cancel"
-              shouldSubmitOnEnter
-              open={openMoveModal}
-              onRequestSubmit={() => {
-                onMoveConfirm(true);
-                setOpenMoveModal(false);
-              }}
-              onRequestClose={() => {
-                onMoveConfirm(false);
-                setOpenMoveModal(false);
-              }}
-            >
-              <div></div>
-            </Modal>
+            <MoveModal
+              fileName={fileName}
+              fileId={106}
+              openMoveModal={openMoveModal}
+              onMoveConfirm={onMoveConfirm}
+              setOpenMoveModal={setOpenMoveModal}
+            ></MoveModal>
           ) : null}
 
           {openCreateFolderModal ? (
