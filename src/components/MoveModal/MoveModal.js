@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
+import "./move-modal.scss";
 import {
   ClickableTile,
   Modal,
   Breadcrumb,
   BreadcrumbItem,
+  OverflowMenu,
+  OverflowMenuItem,
+  UnorderedList,
+  ListItem,
 } from "carbon-components-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllFolders, setAllFolders } from "../../actions/folderAction";
 
-import { Folder20 } from "@carbon/icons-react";
+import { Folder20, OverflowMenuHorizontal16 } from "@carbon/icons-react";
 
 const MoveModal = ({
   fileName,
@@ -69,34 +74,74 @@ const MoveModal = ({
         }}
       >
         <div>
-          <Breadcrumb noTrailingSlash className="mb-3">
-            {breadcrumbs.map((item) => (
-              <BreadcrumbItem onClick={() => setParentId(item.id)} href="#">
-                {item.name}
-              </BreadcrumbItem>
-            ))}
-            {/* {breadcrumbs.length > 0
-              ? breadcrumbs.map(
-                  (item) => '<BreadcrumbItem>"asd"</BreadcrumbItem>'
-                )
-              : ""} */}
-            {/* <BreadcrumbItem href="#">Breadcrumb 1</BreadcrumbItem>
-            <BreadcrumbItem href="#">Breadcrumb 2</BreadcrumbItem> */}
-          </Breadcrumb>
-          {folders
-            .filter((item) => item.type === "folder")
-            .map((item) => (
-              <div>
-                <ClickableTile
-                  className="mb-2"
-                  light
-                  handleClick={() => setParentId(item.id)}
+          <Breadcrumb
+            noTrailingSlash
+            className="mb-3 overflow-hidden bx--text-truncate--end"
+          >
+            {breadcrumbs.length <= 2 ? (
+              breadcrumbs.map((item) => (
+                <BreadcrumbItem
+                  className="d-inline"
+                  isCurrentPage={item.id === parentId}
+                  onClick={() => setParentId(item.id)}
+                  href="#"
                 >
-                  <Folder20 className="mr-3" />
                   {item.name}
-                </ClickableTile>
+                </BreadcrumbItem>
+              ))
+            ) : (
+              <div className="d-flex align-items-center">
+                <BreadcrumbItem
+                  className="d-inline"
+                  isCurrentPage={breadcrumbs[0].id === parentId}
+                  onClick={() => setParentId(breadcrumbs[0].id)}
+                  href="#"
+                >
+                  {breadcrumbs[0].name}
+                </BreadcrumbItem>
+                <OverflowMenu
+                  renderIcon={OverflowMenuHorizontal16}
+                  className="d-flex align-items-center"
+                >
+                  {breadcrumbs.slice(1, breadcrumbs.length - 1).map((item) => (
+                    <OverflowMenuItem
+                      itemText={item.name}
+                      onClick={() => setParentId(item.id)}
+                    />
+                  ))}
+                </OverflowMenu>
+                <span className="mx-2">/</span>
+                <BreadcrumbItem
+                  className="d-inline"
+                  isCurrentPage={
+                    breadcrumbs[breadcrumbs.length - 1].id === parentId
+                  }
+                  onClick={() =>
+                    setParentId(breadcrumbs[breadcrumbs.length - 1].id)
+                  }
+                  href="#"
+                >
+                  {breadcrumbs[breadcrumbs.length - 1].name}
+                </BreadcrumbItem>
               </div>
-            ))}
+            )}
+          </Breadcrumb>
+          <div style={{ minHeight: "50px" }}>
+            {folders
+              .filter((item) => item.type === "folder")
+              .map((item) => (
+                <div>
+                  <ClickableTile
+                    className="mb-2"
+                    light
+                    handleClick={() => setParentId(item.id)}
+                  >
+                    <Folder20 className="mr-3" />
+                    {item.name}
+                  </ClickableTile>
+                </div>
+              ))}
+          </div>
         </div>
       </Modal>
     </React.Fragment>

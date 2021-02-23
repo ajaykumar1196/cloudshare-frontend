@@ -162,6 +162,7 @@ const FileDetails = () => {
   const onMoveConfirm = (ok, newParentId) => {
     if (ok) {
       console.log("onMoveConfirm - " + parentId + "-->" + newParentId);
+      dispatch(fetchDestinationFiles(parentId));
     } else {
       console.log("Not ok");
     }
@@ -171,14 +172,14 @@ const FileDetails = () => {
   const onCreateFolder = () => {
     setOpenCreateFolderModal(true);
     console.log("onCreateFolder - " + newFolderName);
-    setNewFolderName(newFolderName);
+    setNewFolderName(newFolderName.trim());
     setFile({ id: id, fileName: fileName });
   };
 
   const onCreateFolderConfirm = (ok) => {
     if (ok) {
       console.log("onCreateFolderConfirm - " + newFolderName.trim());
-      let folder = { folderName: newFolderName, parentId: parentId };
+      let folder = { folderName: newFolderName.trim(), parentId: parentId };
       dispatch(fetchCreateFolder(folder));
     } else {
       console.log("Not ok");
@@ -189,117 +190,124 @@ const FileDetails = () => {
   return (
     <div className="bx--row">
       <div className="bx--col-lg-16">
-        <DataTable rows={files} headers={headers}>
-          {({
-            rows,
-            headers,
-            getHeaderProps,
-            getRowProps,
-            getSelectionProps,
-            getToolbarProps,
-            onInputChange,
-            selectedRows,
-          }) => (
-            <TableContainer>
-              <TableToolbar {...getToolbarProps()}>
-                <TableToolbarContent>
-                  <TableToolbarSearch
-                    expanded
-                    placeHolderText="Search"
-                    onChange={onInputChange}
-                  />
-
-                  <TableToolbarMenu renderIcon={OverflowMenuVertical20}>
-                    <TableToolbarAction
-                    // onClick={() => batchActionClick(selectedRows)}
-                    >
-                      Move
-                    </TableToolbarAction>
-                    <TableToolbarAction
-                      onClick={() => console.log(selectedRows)}
-                    >
-                      Selected
-                    </TableToolbarAction>
-                  </TableToolbarMenu>
-
-                  <Button
-                    onClick={onCreateFolder}
-                    hasIconOnly
-                    renderIcon={FolderAdd20}
-                  ></Button>
-                </TableToolbarContent>
-              </TableToolbar>
-              <Table overflowMenuOnHover={false}>
-                <TableHead>
-                  <TableRow>
-                    <TableSelectAll {...getSelectionProps()} />
-
-                    {headers.map((header) => (
-                      <TableHeader
-                        key={header.key}
-                        {...getHeaderProps({ header })}
+        {files.length > 0 ? (
+          <DataTable rows={files} headers={headers}>
+            {({
+              rows,
+              headers,
+              getHeaderProps,
+              getRowProps,
+              getSelectionProps,
+              getToolbarProps,
+              onInputChange,
+              selectedRows,
+            }) => (
+              <TableContainer>
+                <TableToolbar {...getToolbarProps()}>
+                  <TableToolbarContent>
+                    <TableToolbarMenu renderIcon={OverflowMenuVertical20}>
+                      <TableToolbarAction
+                      // onClick={() => batchActionClick(selectedRows)}
                       >
-                        {header.header}
+                        Move
+                      </TableToolbarAction>
+                      <TableToolbarAction
+                        onClick={() => console.log(selectedRows)}
+                      >
+                        Selected
+                      </TableToolbarAction>
+                    </TableToolbarMenu>
 
-                        {selectedRows.length !== 0 && header.key === "name" ? (
-                          <Tag type="blue">
-                            {selectedRows.length} files selected
-                          </Tag>
-                        ) : null}
-                      </TableHeader>
-                    ))}
-                    <TableHeader />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.id} {...getRowProps({ row })}>
-                      <TableSelectRow {...getSelectionProps({ row })} />
+                    <Button onClick={onCreateFolder} renderIcon={FolderAdd20}>
+                      Add Folder
+                    </Button>
+                  </TableToolbarContent>
+                </TableToolbar>
+                <Table overflowMenuOnHover={false}>
+                  <TableHead>
+                    <TableRow>
+                      <TableSelectAll {...getSelectionProps()} />
 
-                      <TableCell key={row.cells[0].id}>
-                        {row.cells[1].value === "folder" ? (
-                          <Link to={"/" + row.id}>
-                            <Folder20 className="mr-1" />
-                            {row.cells[0].value}
-                          </Link>
-                        ) : (
-                          row.cells[0].value
-                        )}
-                      </TableCell>
+                      {headers.map((header) => (
+                        <TableHeader
+                          key={header.key}
+                          {...getHeaderProps({ header })}
+                        >
+                          {header.header}
 
-                      <TableCell className="bx--table-column-menu">
-                        <OverflowMenu className="ml-auto" light flipped>
-                          <OverflowMenuItem
-                            onClick={() => onRename(row.id, row.cells[0].value)}
-                            itemText="Rename"
-                          ></OverflowMenuItem>
-                          <OverflowMenuItem
-                            onClick={() => handleFileDownload(row.id)}
-                            itemText="Download"
-                          ></OverflowMenuItem>
-                          <OverflowMenuItem
-                            itemText="Share"
-                            onClick={() => onShare(row.id, row.cells[0].value)}
-                          ></OverflowMenuItem>
-                          <OverflowMenuItem
-                            onClick={() => onMove(row.id, row.cells[0].value)}
-                            itemText="Move"
-                          ></OverflowMenuItem>
-                          <OverflowMenuItem
-                            hasDivider
-                            isDelete
-                            itemText="Delete"
-                            onClick={() => onDelete(row.id, row.cells[0].value)}
-                          ></OverflowMenuItem>
-                        </OverflowMenu>
-                      </TableCell>
+                          {selectedRows.length !== 0 &&
+                          header.key === "name" ? (
+                            <Tag type="blue">
+                              {selectedRows.length} files selected
+                            </Tag>
+                          ) : null}
+                        </TableHeader>
+                      ))}
+                      <TableHeader />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => (
+                      <TableRow key={row.id} {...getRowProps({ row })}>
+                        <TableSelectRow {...getSelectionProps({ row })} />
+
+                        <TableCell key={row.cells[0].id}>
+                          {row.cells[1].value === "folder" ? (
+                            <Link to={"/" + row.id}>
+                              <Folder20 className="mr-1" />
+                              {row.cells[0].value}
+                            </Link>
+                          ) : (
+                            row.cells[0].value
+                          )}
+                        </TableCell>
+
+                        <TableCell className="bx--table-column-menu">
+                          <OverflowMenu className="ml-auto" light flipped>
+                            <OverflowMenuItem
+                              onClick={() =>
+                                onRename(row.id, row.cells[0].value)
+                              }
+                              itemText="Rename"
+                            ></OverflowMenuItem>
+                            {row.cells[1].value !== "folder" ? (
+                              <OverflowMenuItem
+                                onClick={() => handleFileDownload(row.id)}
+                                itemText="Download"
+                              ></OverflowMenuItem>
+                            ) : null}
+                            {row.cells[1].value !== "folder" ? (
+                              <OverflowMenuItem
+                                itemText="Share"
+                                onClick={() =>
+                                  onShare(row.id, row.cells[0].value)
+                                }
+                              ></OverflowMenuItem>
+                            ) : null}
+                            <OverflowMenuItem
+                              onClick={() => onMove(row.id, row.cells[0].value)}
+                              itemText="Move"
+                            ></OverflowMenuItem>
+                            <OverflowMenuItem
+                              hasDivider
+                              isDelete
+                              itemText="Delete"
+                              onClick={() =>
+                                onDelete(row.id, row.cells[0].value)
+                              }
+                            ></OverflowMenuItem>
+                          </OverflowMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+        ) : (
+          "Upload Files"
+        )}
 
         <ModalWrapper>
           {openDeleteModal ? (
