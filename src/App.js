@@ -30,9 +30,9 @@ const App = () => {
           <Switch>
             <PrivateRoute exact path="/" component={LandingPage} />
             <PrivateRoute exact path="/profile" component={ProfilePage} />
-            <PrivateRoute exact path="/:parentId" component={LandingPage} />
             <Route path="/login" component={LoginPage} />
             <Route path="/signup" component={SignupPage} />
+            <PrivateRoute exact path="/:parentId" component={LandingPage} />
             <Redirect from="*" to="/" />
           </Switch>
         </Content>

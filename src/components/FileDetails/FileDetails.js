@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useParams } from "react-router";
+import { useParams } from "react-router";
 import ModalWrapper from "../ModalWrapper/ModalWrapper";
 import {
   DataTable,
@@ -15,7 +15,6 @@ import {
   OverflowMenu,
   OverflowMenuItem,
   TableToolbarContent,
-  TableToolbarSearch,
   TableToolbarMenu,
   TableToolbarAction,
   Button,
@@ -29,7 +28,6 @@ import {
 import {
   OverflowMenuVertical20,
   FolderAdd20,
-  Copy20,
   Folder20,
 } from "@carbon/icons-react";
 
@@ -39,6 +37,7 @@ import {
 } from "../../actions/destinationAction";
 import { fetchFileDownload } from "../../actions/fileDownloadAction";
 import { fetchCreateFolder } from "../../actions/folderAction";
+import { deleteFile, renameFile, moveFile } from "../../actions/fileAction";
 import { Link } from "react-router-dom";
 import MoveModal from "../MoveModal/MoveModal";
 
@@ -120,6 +119,7 @@ const FileDetails = () => {
   const onDeleteConfirm = (ok) => {
     if (ok) {
       console.log("onDeleteConfirm - " + id + " " + fileName);
+      dispatch(deleteFile(id));
       dispatch(fetchDestinationFiles(parentId));
     } else {
       console.log("Not ok");
@@ -139,6 +139,7 @@ const FileDetails = () => {
       console.log(
         "onRenameConfirm - " + id + " " + fileName + " --> " + newFileName
       );
+      dispatch(renameFile(id, newFileName));
       dispatch(fetchDestinationFiles(parentId));
     } else {
       console.log("Not ok");
@@ -162,6 +163,7 @@ const FileDetails = () => {
   const onMoveConfirm = (ok, newParentId) => {
     if (ok) {
       console.log("onMoveConfirm - " + parentId + "-->" + newParentId);
+      dispatch(moveFile(id, newParentId));
       dispatch(fetchDestinationFiles(parentId));
     } else {
       console.log("Not ok");
